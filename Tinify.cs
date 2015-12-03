@@ -26,6 +26,16 @@ public class Tinify {
 	private string base64ApiKey { get; set; }
 
 	/// <summary>
+	/// HTTP status code from the last request.
+	/// </summary>
+	public int LastHttpStatusCode { get; set; }
+
+	/// <summary>
+	/// HTTP status description from the last request.
+	/// </summary>
+	public string LastHttpStatusDescription { get; set; }
+
+	/// <summary>
 	/// The Tinify API allows you to compress and optimize JPEG and PNG images.
 	/// </summary>
 	/// <param name="apiKey"></param>
@@ -212,12 +222,33 @@ public class Tinify {
 			requestStream.Write(bytes, 0, bytes.Length);
 		}
 
-		var response = request.GetResponse() as HttpWebResponse;
+		this.LastHttpStatusCode = 0;
+		this.LastHttpStatusDescription = null;
 
-		if (response == null)
-			throw new WebException("Request returned NULL response.");
+		HttpWebResponse response = null;
 
-		return response.GetResponseStream();
+		try {
+			response = request.GetResponse() as HttpWebResponse;
+
+			if (response == null)
+				throw new Exception("Request returned NULL response.");
+
+			this.LastHttpStatusCode = (int) response.StatusCode;
+			this.LastHttpStatusDescription = response.StatusDescription;
+		}
+		catch (WebException ex) {
+			var erres = ex.Response as HttpWebResponse;
+
+			if (erres == null)
+				throw new Exception("Request returned NULL response.");
+
+			this.LastHttpStatusCode = (int) erres.StatusCode;
+			this.LastHttpStatusDescription = erres.StatusDescription;
+		}
+
+		return response != null
+			? response.GetResponseStream()
+			: null;
 	}
 
 	/// <summary>
