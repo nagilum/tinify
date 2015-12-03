@@ -11,10 +11,11 @@ The Tinify API allows you to compress and optimize JPEG and PNG images.
 var tinify = new Tinify("--your-api-key-from-tiny-png--");
 
 // Upload and shrink an image.
-var resp = tinify.Shrink(
-    Server.MapPath("~/wallhaven-88501.jpg"),
-    Server.MapPath("~/wallhaven-88501-tinify.jpg"));
+var resp = tinify.Shrink(Server.MapPath("~/wallhaven-88501.jpg"));
 ```
+
+If you specify a second file in the `Shrink` function, it will automatically download the shrinked file.
+You can also pass along credentials and info to tell tiny-png to upload the shrinked file directly to Amazon S3.
 
 The response object you get back from the wrapper can be used to scale, fit, or adjust the image before downloading it again.
 
